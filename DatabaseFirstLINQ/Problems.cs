@@ -37,7 +37,7 @@ namespace DatabaseFirstLINQ
             ProblemTwenty();
         }
 
-         <><><><><><><><> R Actions(Read) <><><><><><><><><>
+         //<><><><><><><><> R Actions(Read) <><><><><><><><><>
         private void ProblemOne()
         {
             // Write a LINQ query that returns the number of users in the Users table.
@@ -166,12 +166,23 @@ namespace DatabaseFirstLINQ
             // HINT: End of query will be: .Select(sc => sc.Product.Price).Sum();
             // Then print the total of the shopping cart to the console.
 
+            var productsSum = _context.ShoppingCarts.Include(sc => sc.Product).Where(u => u.User.Email == "oda@gmail.com").Select(sc => sc.Product.Price).Sum();
+            Console.WriteLine($"Shopping Cart Total: {productsSum}");
+
+
         }
 
         private void ProblemTen()
         {
             // Write a LINQ query that retreives all of the products in the shopping cart of users who have the role of "Employee".
             // Then print the user's email as well as the product's name, price, and quantity to the console.
+
+            var usersInRole = _context.UserRoles.Where(u => u.Role.RoleName == "Employee").Select(u => u.User.Id);
+            var userShoppingCartProducts = _context.ShoppingCarts.Include(sc => sc.Product).Include(sc => sc.User).Where(sc => usersInRole.Contains(sc.UserId));
+            foreach (var shoppingCart in userShoppingCartProducts)
+            {
+                Console.WriteLine($"Email: {shoppingCart.User.Email}\n Product Name: {shoppingCart.Product.Name}\n {shoppingCart.Product.Price}\n {shoppingCart.Quantity}\n\n ");
+            }
 
         }
 
@@ -194,7 +205,15 @@ namespace DatabaseFirstLINQ
         private void ProblemTwelve()
         {
             // Create a new Product object and add that product to the Products table using LINQ.
+            Product newProduct = new Product()
+            {
+                Name = "Playstation 5",
+                Description = "Playstation 5 gaming console",
+                Price = 499
+            };
 
+            _context.Products.Add(newProduct);
+            _context.SaveChanges();
         }
 
         private void ProblemThirteen()
